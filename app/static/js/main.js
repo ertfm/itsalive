@@ -21,7 +21,7 @@ addHostForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
     friendlyName = friendlyNameText.value
-    hostname = host<nameText.value
+    hostname = hostnameText.value
 
     socket.emit('client:add-host', {
         'friendly-name':friendlyName,
