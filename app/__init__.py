@@ -1,11 +1,14 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_socketio import SocketIO
 from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
 db = SQLAlchemy(app)
+socket = SocketIO(app)
+
 scheduler = BackgroundScheduler()
 
 scheduler.start()
@@ -19,7 +22,7 @@ with app.app_context():
     if hosts:
         schedule_ping(hosts)
 
-from app import views
+from app import views, socket_handlers
 
 
     
