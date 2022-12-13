@@ -1,0 +1,37 @@
+#dashboard {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 2em;
+}
+
+.box {
+    padding: 0.5em;
+    width: 18em;
+    height: 15em;
+    margin: 0.5em;
+    border-radius: 1rem;
+    position: relative;
+    background-color: var(--card-background-color);
+    border: 2px solid var(--color);
+    color: var(--color);
+}
+
+.box h5 {
+    margin: 0;
+    color: inherit;
+}
+
+.box small {
+    color: var(--color);
+}
+
+.status {
+    font-size: 3.5em;
+    text-align: right;
+    position: absolute;
+    bottom: 0;
+    right: 15px;
+    color: inherit;
+}
