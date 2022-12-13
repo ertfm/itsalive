@@ -19,6 +19,7 @@ with app.app_context():
     if hosts:
         schedule_ping(hosts)
 
+from app import views
 
 
     
