@@ -51,6 +51,14 @@ addHostForm.addEventListener('submit', (e) => {
     })
 })
 
+socket.on('server:send-hosts', (response) => {
+    if (response.status == 'success') {
+        response.data.forEach(host => {
+            addHostBox(host)
+        });
+    }
+ 
+})
 
 socket.on('server:add-host', (response) => {
     console.log(response)
