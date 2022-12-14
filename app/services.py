@@ -1,4 +1,4 @@
-from app import db, scheduler
+from app import db, scheduler, socket
 from app.models import Host
 from subprocess import call, DEVNULL
 
@@ -12,6 +12,7 @@ def schedule_ping(hosts):
 
 def ping(host):
     exit_code = call(['ping','-c','1',host.hostname], stdout=DEVNULL, stderr=DEVNULL)
+    socket.emit('server:host-status-update', {'status':'success', 'data': { 'host':  host.to_json(),'exit_code':exit_code },'message':'host status update'})
     print(f'{host.hostname}:{exit_code}')
 
 def add_host(new_host):

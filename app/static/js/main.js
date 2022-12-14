@@ -6,6 +6,10 @@ const addHostForm = document.querySelector('#add-host-form');
 const friendlyNameText = addHostForm.querySelector('#friendly-name');
 const hostnameText = addHostForm.querySelector('#hostname');
 
+const styles = getComputedStyle(document.documentElement);
+const greenColor = styles.getPropertyValue('--ins-color');
+const redColor = styles.getPropertyValue('--del-color');
+
 const socket = io();
 
 function addHostBox(host) {
@@ -65,5 +69,21 @@ socket.on('server:add-host', (response) => {
         addHostBox(response.data);
         addHostModal.removeAttribute('open');
         addHostForm.reset();
+    }
+});
+
+socket.on('server:host-status-update', (response) => {  
+    if (response.status == 'success') {
+        const divBox = document.getElementById(response.data.host.friendly_name);
+        const statusSpan = divBox.querySelector('.status');
+        if (response.data.exit_code == '0') {
+          divBox.style.borderColor = greenColor;
+          divBox.style.color = greenColor;
+          statusSpan.textContent = 'UP';
+        } else {
+            divBox.style.borderColor = redColor;
+            divBox.style.color = redColor;
+            statusSpan.textContent = 'DOWN';
+        }
     }
 });
