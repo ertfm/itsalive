@@ -15,28 +15,14 @@ def ping(host):
     print(f'{host.hostname}:{exit_code}')
 
 def add_host(new_host):
-    try:
-        friendly_name = new_host['friendly-name']
-        hostname = new_host['hostname']
+    friendly_name = new_host['friendly-name']
+    hostname = new_host['hostname']
 
-        host = Host(friendly_name, hostname)
+    host = Host(friendly_name, hostname)
 
-        db.session.add(host)
-        db.session.commit()
+    db.session.add(host)
+    db.session.commit()
     
-        schedule_ping([host])
+    schedule_ping([host])
 
-        return {
-            'status': 'success',
-            'data': host.to_json(),
-            'message': 'Host added successfuly'
-        }
-
-    except Exception as e:
-        print(e)
-        
-        return {
-            'status': 'error',
-            'data': '',
-            'message': 'Here goes a descriptive error'
-        }
+    return host 
