@@ -28,9 +28,15 @@ function addHostBox(host) {
     statusSpan.className = 'status';
     statusSpan.textContent = '-';
 
+    const delLink = document.createElement('a');
+    delLink.className = 'del-host-btn';
+    delLink.href = '#';
+    delLink.textContent = 'Delete'
+
     boxDiv.appendChild(friendlyNameHeader);
     boxDiv.appendChild(hostnameSmall);
     boxDiv.appendChild(statusSpan);
+    boxDiv.appendChild(delLink)
     dashboardDiv.appendChild(boxDiv);
 }
 
