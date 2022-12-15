@@ -38,6 +38,12 @@ function addHostBox(host) {
     boxDiv.appendChild(statusSpan);
     boxDiv.appendChild(delLink)
     dashboardDiv.appendChild(boxDiv);
+
+    delLink.addEventListener('click', () => {
+        socket.emit('client:delete-host', {
+            'friendly_name':host.friendly_name
+        });
+    });
 }
 
 addHostBtn.addEventListener('click', () => {
@@ -93,3 +99,11 @@ socket.on('server:host-status-update', (response) => {
         }
     }
 });
+
+socket.on('server:delete-host', (response) => {
+    console.log(response)
+    if (response.status == 'success') {
+        const divBox = document.getElementById(response.data.friendly_name)
+        divBox.remove()
+    }
+})

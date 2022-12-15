@@ -27,3 +27,10 @@ def add_host(new_host):
     schedule_ping([host])
 
     return host 
+
+def delete_host(host):
+    host = db.session.query(Host).filter_by(friendly_name=host['friendly_name']).first()
+    db.session.delete(host)
+    db.session.commit()
+    scheduler.remove_job(str(host.id))
+    return host
