@@ -27,6 +27,15 @@
     color: var(--color);
 }
 
+.box:hover {
+    border: 2px solid;
+    box-shadow: 0 0 12px;
+}
+
+.box:hover > .del-host-btn {
+    display: block;
+}
+
 .status {
     font-size: 3.5em;
     text-align: right;
@@ -34,4 +43,12 @@
     bottom: 0;
     right: 15px;
     color: inherit;
+}
+
+.del-host-btn {
+    text-align: left;
+    position: absolute;
+    bottom: 20px;
+    left: 15px;
+    display: none;
 }
