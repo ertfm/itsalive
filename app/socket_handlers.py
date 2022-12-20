@@ -1,12 +1,14 @@
 from app import socket
 from app.services import add_host, get_hosts, delete_host
+from flask import request
 
 @socket.on('connect')
 def connection_handler():
+    client_id = request.sid
     try:
         hosts = [ host.to_json() for host in get_hosts() ]
         if hosts:
-            socket.emit('server:send-hosts', { 'status':'success', 'data':hosts})
+            socket.emit('server:send-hosts', { 'status':'success', 'data':hosts}, to=client_id)
 
     except Exception as e:
         socket.emit('server:send-hosts', { 'status':'error', 'data': 'here goes a descriptive error'})
