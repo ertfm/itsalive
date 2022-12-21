@@ -17,7 +17,7 @@ def connection_handler():
 def add_host_handler(new_host):
     try:
         host = add_host(new_host)
-        socket.emit('server:add-host', {'status': 'success','data': host.to_json(), 'message': 'Host added successfuly'})
+        socket.emit('server:add-host', {'status': 'success','data': host.to_json() , 'message': 'Host added successfuly'})
 
     except Exception as e:
         socket.emit('server:add-host',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})
@@ -26,7 +26,7 @@ def add_host_handler(new_host):
 def delete_host_handler(host):
     try:
         host = delete_host(host)
-        socket.emit('server:delete-host', { 'status':'success','data':host.to_json(),'message':'Host delete successfuly' })
+        socket.emit('server:delete-host', { 'status':'success','data': { 'id':host.id },'message':'Host delete successfuly' })
     
     except Exception as e:
         print(e)

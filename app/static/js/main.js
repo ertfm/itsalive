@@ -15,7 +15,7 @@ const socket = io();
 function addHostBox(host) {
     console.log(host);
     const boxDiv = document.createElement('div');
-    boxDiv.id = host.friendly_name;
+    boxDiv.id = host.id;
     boxDiv.className = 'box';
 
     const friendlyNameHeader = document.createElement('h5');
@@ -67,6 +67,7 @@ addHostForm.addEventListener('submit', (e) => {
 });
 
 socket.on('server:send-hosts', (response) => {
+    console.log(response)
     if (response.status == 'success') {
         response.data.forEach(host => {
             addHostBox(host);
@@ -84,9 +85,10 @@ socket.on('server:add-host', (response) => {
     }
 });
 
-socket.on('server:host-status-update', (response) => {  
+socket.on('server:host-status-update', (response) => {
+    console.log(response)
     if (response.status == 'success') {
-        const divBox = document.getElementById(response.data.host.friendly_name);
+        const divBox = document.getElementById(response.data.id);
         const statusSpan = divBox.querySelector('.status');
         if (response.data.exit_code == '0') {
           divBox.style.borderColor = greenColor;
@@ -103,7 +105,7 @@ socket.on('server:host-status-update', (response) => {
 socket.on('server:delete-host', (response) => {
     console.log(response)
     if (response.status == 'success') {
-        const divBox = document.getElementById(response.data.friendly_name)
+        const divBox = document.getElementById(response.data.id)
         divBox.remove()
     }
 })

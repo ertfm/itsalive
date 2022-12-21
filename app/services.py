@@ -12,7 +12,7 @@ def schedule_ping(hosts):
 
 def ping(host):
     exit_code = call(['ping','-c','1',host.hostname], stdout=DEVNULL, stderr=DEVNULL)
-    socket.emit('server:host-status-update', {'status':'success', 'data': { 'host':  host.to_json(),'exit_code':exit_code },'message':'host status update'})
+    socket.emit('server:host-status-update', {'status':'success', 'data': { 'id':host.id, 'exit_code':exit_code}})
     print(f'{host.hostname}:{exit_code}')
 
 def add_host(new_host):
