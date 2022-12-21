@@ -4,8 +4,8 @@ class Host(db.Model):
     __tablename__ = 'hosts'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    friendly_name = db.Column(db.String, nullable=False, unique=True)
-    hostname = db.Column(db.String, nullable=False, unique=True)
+    friendly_name = db.Column(db.String, nullable=False)
+    hostname = db.Column(db.String, nullable=False)
 
     def __init__(self, friendly_name, hostname):
         self.friendly_name = friendly_name
