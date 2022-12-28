@@ -32,7 +32,7 @@
     box-shadow: 0 0 12px;
 }
 
-.box:hover > .del-host-btn {
+.box:hover > .del-box {
     display: block;
 }
 
@@ -45,10 +45,23 @@
     color: inherit;
 }
 
-.del-host-btn {
+.del-box {
+    all: unset;
     text-align: left;
     position: absolute;
     bottom: 20px;
     left: 15px;
     display: none;
+    cursor: pointer;
+    color: var(--primary);
+}
+
+.up {
+    color: var(--ins-color);
+    border: 2px solid var(--ins-color);
+}
+
+.down {
+    color: var(--del-color);
+    border: 2px solid var(--del-color);
 }

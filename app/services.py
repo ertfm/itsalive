@@ -16,10 +16,10 @@ def ping(host):
     print(f'{host.hostname}:{exit_code}')
 
 def add_host(new_host):
-    friendly_name = new_host['friendly-name']
+    fname = new_host['fname']
     hostname = new_host['hostname']
 
-    host = Host(friendly_name, hostname)
+    host = Host(fname, hostname)
 
     db.session.add(host)
     db.session.commit()
@@ -29,7 +29,7 @@ def add_host(new_host):
     return host 
 
 def delete_host(host):
-    host = db.session.query(Host).filter_by(friendly_name=host['friendly_name']).first()
+    host = db.session.query(Host).filter_by(fname=host['fname']).first()
     db.session.delete(host)
     db.session.commit()
     scheduler.remove_job(str(host.id))

@@ -1,86 +1,118 @@
-const dashboardDiv = document.querySelector('#dashboard');
-const addHostBtn = document.querySelector('#add-host-btn');
-const addHostModal = document.querySelector('#add-host-modal');
-const addHostModalCloseBtn = document.querySelector('#add-host-modal-close-btn');
-const addHostForm = document.querySelector('#add-host-form');
-const friendlyNameText = addHostForm.querySelector('#friendly-name');
-const hostnameText = addHostForm.querySelector('#hostname');
+/*
+Variables
+*/
 
-const styles = getComputedStyle(document.documentElement);
-const greenColor = styles.getPropertyValue('--ins-color');
-const redColor = styles.getPropertyValue('--del-color');
+const dashboard = document.querySelector('#dashboard');
+const showAddHost = document.querySelector('#show-add-host');
+const addHostModal = document.querySelector('#add-host-modal');
+const closeAddHost = document.querySelector('#close-add-host');
+const addHostForm = document.querySelector('#add-host-form');
 
 const socket = io();
+let visibleModal = null;
+
+/*
+Functions
+*/
 
 function addHostBox(host) {
-    console.log(host);
-    const boxDiv = document.createElement('div');
-    boxDiv.id = host.id;
-    boxDiv.className = 'box';
+    const box = document.createElement('div');
+    box.id = host.id;
+    box.className = 'box';
 
-    const friendlyNameHeader = document.createElement('h5');
-    friendlyNameHeader.textContent = host.friendly_name;
+    const fname = document.createElement('h5');
+    fname.textContent = host.fname;
 
-    const hostnameSmall = document.createElement('small');
-    hostnameSmall.textContent = host.hostname;
+    const hostname = document.createElement('small');
+    hostname.textContent = host.hostname;
 
-    const statusSpan = document.createElement('span');
-    statusSpan.className = 'status';
-    statusSpan.textContent = '-';
+    const status = document.createElement('span');
+    status.className = 'status';
+    status.textContent = '-';
 
-    const delLink = document.createElement('a');
-    delLink.className = 'del-host-btn';
-    delLink.href = '#';
-    delLink.textContent = 'Delete'
+    const del = document.createElement('button')
+    del.className = 'del-box'
+    del.textContent = 'Delete'
 
-    boxDiv.appendChild(friendlyNameHeader);
-    boxDiv.appendChild(hostnameSmall);
-    boxDiv.appendChild(statusSpan);
-    boxDiv.appendChild(delLink)
-    dashboardDiv.appendChild(boxDiv);
+    box.appendChild(fname);
+    box.appendChild(hostname);
+    box.appendChild(status);
+    box.appendChild(del);
+    dashboard.appendChild(box);
 
-    delLink.addEventListener('click', () => {
+    del.addEventListener('click', () => {
         socket.emit('client:delete-host', {
-            'friendly_name':host.friendly_name
+            'fname':host.fname
         });
     });
 }
 
-addHostBtn.addEventListener('click', () => {
-    addHostModal.setAttribute('open', true);
+function openModal(modal, elFocus) {
+    visibleModal = modal;
+    visibleModal.setAttribute('open', true);
+    if (elFocus) {
+        elFocus.focus();
+    }
+}
+
+function closeModal(modal) {
+    modal.removeAttribute('open');
+    visibleModal = null;
+}
+
+/*
+Events Listeners
+*/
+
+showAddHost.addEventListener('click', () => {
+    if (!visibleModal) {
+        openModal(addHostModal, document.querySelector('#add-host-fname'));
+    }
 });
 
-addHostModalCloseBtn.addEventListener('click', () => {
-    addHostModal.removeAttribute('open');
+closeAddHost.addEventListener('click', () => {
+    if (visibleModal) {
+        closeModal(addHostModal);
+    }
 });
+
+document.addEventListener('keydown', (e) => {
+    if (e.key == 'Escape' && visibleModal) {
+        closeModal(visibleModal);
+    }
+})
+
+document.addEventListener('click', (e) => {
+    if (e.target==visibleModal) {
+        closeModal(visibleModal);
+    }
+})
 
 addHostForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    friendlyName = friendlyNameText.value;
-    hostname = hostnameText.value;
-
-    socket.emit('client:add-host', {
-        'friendly-name':friendlyName,
-        'hostname':hostname
-    });
+    const data = new FormData(addHostForm);
+    socket.emit('client:add-host', Object.fromEntries(data));
 });
 
+/*
+Socket handlers
+*/
+
 socket.on('server:send-hosts', (response) => {
-    console.log(response)
+    console.log(response);
     if (response.status == 'success') {
         response.data.forEach(host => {
             addHostBox(host);
         });
     }
- 
 });
 
 socket.on('server:add-host', (response) => {
     console.log(response);
     if (response.status == 'success') {
         addHostBox(response.data);
-        addHostModal.removeAttribute('open');
+        closeModal(visibleModal);
         addHostForm.reset();
     }
 });
@@ -88,24 +120,24 @@ socket.on('server:add-host', (response) => {
 socket.on('server:host-status-update', (response) => {
     console.log(response)
     if (response.status == 'success') {
-        const divBox = document.getElementById(response.data.id);
-        const statusSpan = divBox.querySelector('.status');
+        const box = document.getElementById(response.data.id);
+        const status = box.querySelector('.status');
         if (response.data.exit_code == '0') {
-          divBox.style.borderColor = greenColor;
-          divBox.style.color = greenColor;
-          statusSpan.textContent = 'UP';
+            box.classList.remove('down');
+            box.classList.add('up');
+            status.textContent = 'UP';
         } else {
-            divBox.style.borderColor = redColor;
-            divBox.style.color = redColor;
-            statusSpan.textContent = 'DOWN';
+            box.classList.remove('up');
+            box.classList.add('down');
+            status.textContent = 'DOWN';
         }
     }
 });
 
 socket.on('server:delete-host', (response) => {
-    console.log(response)
+    console.log(response);
     if (response.status == 'success') {
-        const divBox = document.getElementById(response.data.id)
-        divBox.remove()
+        const box = document.getElementById(response.data.id);
+        box.remove();
     }
 })

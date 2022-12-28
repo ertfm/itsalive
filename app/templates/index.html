@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
     <head>
         <title>It's Alive!</title>
         <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
@@ -11,12 +11,12 @@
         <nav class="container-fluid">
             <ul>
                 <li>
-                    <a href=#>It's alive</a>
+                    <a href="{{ url_for('index') }}">It's alive</a>
                 </li>
             </ul>
             <ul>
-                <li><a href="#add-host" id="add-host-btn" role="button">Add host</a></li>
-                <li><a href="#events" id="open-events-btn" role="button">Events</a></li>
+                <li><button id="show-add-host">Add host</button></li>
+                <li><button id="show-events">Events</button></li>
             </ul>
         </nav>
 
@@ -27,21 +27,21 @@
         <dialog id="add-host-modal">
             <article>
                 <header>
-                    <a href="#close" class="close" id="add-host-modal-close-btn"></a>
+                    <a href="#" class="close" id="close-add-host"></a>
                     Add host
                 </header>
 
                 <form id="add-host-form">
-                    <label for="friendly-name">Friendly name:</label>
-                    <input type="text" id="friendly-name" name="friendly-name" placeholder="Insert friendly name" required>
+                    <label for="fname">Friendly name:</label>
+                    <input type="text" id="add-host-fname" name="fname" placeholder="Insert friendly name" required>
                     <label for="hostname">Hostname:</label>
-                    <input type="text" id="hostname" name="hostname" placeholder="Insert hostname" required>
+                    <input type="text" id="add-host-hostname" name="hostname" placeholder="Insert hostname" required>
                     <button type="submit">Add</button>
                 </form>
             </article>
          
         </dialog>
-
+        
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     </body>
 </html>
