@@ -4,9 +4,15 @@ Variables
 
 const dashboard = document.querySelector('#dashboard');
 const showAddHost = document.querySelector('#show-add-host');
+const showEvents = document.querySelector('#show-events');
 const addHostModal = document.querySelector('#add-host-modal');
+const showEventsModal = document.querySelector('#show-events-modal');
 const closeAddHost = document.querySelector('#close-add-host');
+const closeShowEvents = document.querySelector('#close-show-events');
 const addHostForm = document.querySelector('#add-host-form');
+
+const tableBody = showEventsModal.querySelector('table').querySelector('tbody');
+
 
 const socket = io();
 let visibleModal = null;
@@ -76,6 +82,21 @@ closeAddHost.addEventListener('click', () => {
     }
 });
 
+showEvents.addEventListener('click', () => {
+    tableBody.innerHTML = '';
+
+    socket.emit('client:send-events');
+    if (!visibleModal) {
+        openModal(showEventsModal);
+    }
+});
+
+closeShowEvents.addEventListener('click', () => {
+    if (visibleModal) {
+        closeModal(showEventsModal);
+    }
+});
+
 document.addEventListener('keydown', (e) => {
     if (e.key == 'Escape' && visibleModal) {
         closeModal(visibleModal);
@@ -139,5 +160,26 @@ socket.on('server:delete-host', (response) => {
     if (response.status == 'success') {
         const box = document.getElementById(response.data.id);
         box.remove();
+    }
+})
+
+socket.on('server:send-events', (response) => {
+    if (response.status == 'success') {
+        response.data.forEach(event => {
+            let row = tableBody.insertRow();
+
+            let datetime = row.insertCell(0);
+            datetime.textContent = event.created;
+
+            let fname = row.insertCell(1);
+            fname.textContent = event.fname;
+
+            let status = row.insertCell(2);
+            status.textContent = event.status;
+
+            row.appendChild(datetime);
+            row.appendChild(fname);
+            row.appendChild(status);
+        });
     }
 })

@@ -1,5 +1,5 @@
 from app import socket
-from app.services import add_host, get_hosts, delete_host
+from app.services import add_host, get_hosts, delete_host, get_events
 from flask import request
 
 @socket.on('connect')
@@ -31,3 +31,13 @@ def delete_host_handler(host):
     except Exception as e:
         print(e)
         socket.emit('server:delete-host',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})
+
+@socket.on('client:send-events')
+def send_events_handler():
+    try:
+        events = [ event.to_json() for event in get_events() ]
+        socket.emit('server:send-events', {'status':'success','data': events, 'message':'Events sent succeessfuly'})
+    
+    except Exception as e:
+        print(e)
+        socket.emit('server:add-host',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})
