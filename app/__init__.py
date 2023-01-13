@@ -4,10 +4,12 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
 from apscheduler.schedulers.background import BackgroundScheduler
+from  pathlib import Path
+
+db_path = Path(Path.cwd(),'data','database.db')
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + str(db_path)
 db = SQLAlchemy(app)
 socket = SocketIO(app)
 

@@ -10,9 +10,7 @@ const showEventsModal = document.querySelector('#show-events-modal');
 const closeAddHost = document.querySelector('#close-add-host');
 const closeShowEvents = document.querySelector('#close-show-events');
 const addHostForm = document.querySelector('#add-host-form');
-
-const tableBody = showEventsModal.querySelector('table').querySelector('tbody');
-
+const events = showEventsModal.querySelector('table').querySelector('tbody');
 
 const socket = io();
 let visibleModal = null;
@@ -29,20 +27,15 @@ function addHostBox(host) {
     const fname = document.createElement('h5');
     fname.textContent = host.fname;
 
-    const hostname = document.createElement('small');
+    const hostname = document.createElement('p');
     hostname.textContent = host.hostname;
-
-    const status = document.createElement('span');
-    status.className = 'status';
-    status.textContent = '-';
-
+    
     const del = document.createElement('button')
-    del.className = 'del-box'
-    del.textContent = 'Delete'
+    del.className = 'del-host-btn'
+    del.textContent = ''
 
     box.appendChild(fname);
     box.appendChild(hostname);
-    box.appendChild(status);
     box.appendChild(del);
     dashboard.appendChild(box);
 
@@ -83,7 +76,7 @@ closeAddHost.addEventListener('click', () => {
 });
 
 showEvents.addEventListener('click', () => {
-    tableBody.innerHTML = '';
+    events.innerHTML = '';
 
     socket.emit('client:send-events');
     if (!visibleModal) {
@@ -146,11 +139,9 @@ socket.on('server:host-status-update', (response) => {
         if (response.data.exit_code == '0') {
             box.classList.remove('down');
             box.classList.add('up');
-            status.textContent = 'UP';
         } else {
             box.classList.remove('up');
             box.classList.add('down');
-            status.textContent = 'DOWN';
         }
     }
 });
@@ -166,7 +157,7 @@ socket.on('server:delete-host', (response) => {
 socket.on('server:send-events', (response) => {
     if (response.status == 'success') {
         response.data.forEach(event => {
-            let row = tableBody.insertRow();
+            let row = events.insertRow();
 
             let datetime = row.insertCell(0);
             datetime.textContent = event.created;
