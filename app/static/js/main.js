@@ -125,9 +125,15 @@ socket.on('server:send-hosts', (response) => {
 socket.on('server:add-host', (response) => {
     console.log(response);
     if (response.status == 'success') {
-        addHostBox(response.data);
         closeModal(visibleModal);
         addHostForm.reset();
+    }
+});
+
+socket.on('server:new-host-added', (response) => {
+    console.log(response)
+    if (response.status == 'success') {
+       addHostBox(response.data);
     }
 });
 

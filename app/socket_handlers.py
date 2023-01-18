@@ -15,12 +15,14 @@ def connection_handler():
 
 @socket.on('client:add-host')
 def add_host_handler(new_host):
+    client_id = request.sid
     try:
         host = add_host(new_host)
-        socket.emit('server:add-host', {'status': 'success','data': host.to_json() , 'message': 'Host added successfuly'})
+        socket.emit('server:add-host', {'status': 'success','data': '' , 'message': 'Host added successfuly'}, to=client_id)
+        socket.emit('server:new-host-added', {'status': 'success','data': host.to_json() , 'message': 'New host added'})
 
     except Exception as e:
-        socket.emit('server:add-host',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})
+        socket.emit('server:add-host',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'}, to=client_id)
 
 @socket.on('client:delete-host')
 def delete_host_handler(host):
