@@ -10,6 +10,7 @@ const showEventsModal = document.querySelector('#show-events-modal');
 const closeAddHost = document.querySelector('#close-add-host');
 const closeShowEvents = document.querySelector('#close-show-events');
 const addHostForm = document.querySelector('#add-host-form');
+const disconnectedModal = document.querySelector('#disconnected-modal');
 const events = showEventsModal.querySelector('table').querySelector('tbody');
 
 const socket = io();
@@ -91,13 +92,13 @@ closeShowEvents.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', (e) => {
-    if (e.key == 'Escape' && visibleModal) {
+    if (e.key == 'Escape' && visibleModal && visibleModal.id != 'disconnected-modal') {
         closeModal(visibleModal);
     }
 })
 
 document.addEventListener('click', (e) => {
-    if (e.target==visibleModal) {
+    if (e.target==visibleModal && visibleModal.id != 'disconnected-modal') {
         closeModal(visibleModal);
     }
 })
@@ -112,6 +113,23 @@ addHostForm.addEventListener('submit', (e) => {
 /*
 Socket handlers
 */
+
+socket.on('connect', () => {
+    if (visibleModal) {
+        if (visibleModal.id == 'disconnected-modal') {
+            closeModal(visibleModal);
+        }
+    }
+});
+
+socket.on('disconnect', () => {
+    dashboard.innerHTML = '';
+    if (visibleModal) {
+        console.log(visibleModal);
+        closeModal(visibleModal);
+    }
+    openModal(disconnectedModal);
+});
 
 socket.on('server:send-hosts', (response) => {
     console.log(response);
