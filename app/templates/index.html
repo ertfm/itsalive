@@ -17,7 +17,7 @@
                 </li>
             </ul>
             <ul>
-                <li><button id="show-add-host">Add host</button></li>
+                <li><button id="show-add-monitor">Add monitor</button></li>
                 <li><button id="show-events">Events</button></li>
             </ul>
         </nav>
@@ -26,18 +26,27 @@
 
         </div>
 
-        <dialog id="add-host-modal">
+        <dialog id="add-monitor-modal">
             <article>
                 <header>
-                    <a href="#" class="close" id="close-add-host"></a>
-                    Add host
+                    <a href="#" class="close" id="close-add-monitor"></a>
+                    Add monitor
                 </header>
 
-                <form id="add-host-form">
+                <form id="add-monitor-form">
                     <label for="fname">Friendly name:</label>
-                    <input type="text" id="add-host-fname" name="fname" placeholder="Insert friendly name" required>
+                    <input type="text" id="add-monitor-fname" name="fname" placeholder="Insert friendly name" required>
                     <label for="hostname">Hostname:</label>
-                    <input type="text" id="add-host-hostname" name="hostname" placeholder="Insert hostname" required>
+                    <input type="text" id="add-monitor-hostname" name="hostname" placeholder="Insert hostname" required>
+                    <label for="ctype">Type</label>
+                    <select id="ctype" named="ctype" form="add-monitor-form" required>
+                        <option value="ping">Ping</option>
+                        <option value="tcp">TCP</option>
+                    </select>
+                    <fieldset id="port-data-field">
+                        <label for="port">Port</label>
+                        <input type="text" name="port" placeholder="Insert TCP port" id="port">
+                    </fieldset>
                     <button type="submit">Add</button>
                 </form>
             </article>

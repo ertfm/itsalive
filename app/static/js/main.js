@@ -3,15 +3,18 @@ Variables
 */
 
 const dashboard = document.querySelector('#dashboard');
-const showAddHost = document.querySelector('#show-add-host');
+const showAddMonitor = document.querySelector('#show-add-monitor');
 const showEvents = document.querySelector('#show-events');
-const addHostModal = document.querySelector('#add-host-modal');
+const addMonitorModal = document.querySelector('#add-monitor-modal');
 const showEventsModal = document.querySelector('#show-events-modal');
-const closeAddHost = document.querySelector('#close-add-host');
+const closeAddMonitor = document.querySelector('#close-add-monitor');
 const closeShowEvents = document.querySelector('#close-show-events');
-const addHostForm = document.querySelector('#add-host-form');
+const addMonitorForm = document.querySelector('#add-monitor-form');
 const disconnectedModal = document.querySelector('#disconnected-modal');
 const events = showEventsModal.querySelector('table').querySelector('tbody');
+const ctype = addMonitorForm.querySelector('#ctype')
+const portDataField = addMonitorForm.querySelector('#port-data-field')
+const port = portDataField.querySelector('#port')
 
 const socket = io();
 let visibleModal = null;
@@ -20,19 +23,19 @@ let visibleModal = null;
 Functions
 */
 
-function addHostBox(host) {
+function addMonitorBox(monitor) {
     const box = document.createElement('div');
-    box.id = host.id;
+    box.id = monitor.id;
     box.className = 'box';
 
     const fname = document.createElement('h5');
-    fname.textContent = host.fname;
+    fname.textContent = monitor.fname;
 
     const hostname = document.createElement('p');
-    hostname.textContent = host.hostname;
+    hostname.textContent = monitor.hostname;
     
     const del = document.createElement('button')
-    del.className = 'del-host-btn'
+    del.className = 'del-monitor-btn'
     del.textContent = ''
 
     box.appendChild(fname);
@@ -41,8 +44,8 @@ function addHostBox(host) {
     dashboard.appendChild(box);
 
     del.addEventListener('click', () => {
-        socket.emit('client:delete-host', {
-            'fname':host.fname
+        socket.emit('client:delete-monitor', {
+            'fname':monitor.fname
         });
     });
 }
@@ -60,19 +63,32 @@ function closeModal(modal) {
     visibleModal = null;
 }
 
+function togglePortDataField() {
+    if (ctype.value == 'tcp') {
+        portDataField.hidden = false;
+        port.required = true;
+    }
+    if (ctype.value == 'ping') {
+        portDataField.hidden = true;
+        port.required = false;
+    }
+}
+
 /*
 Events Listeners
 */
 
-showAddHost.addEventListener('click', () => {
+showAddMonitor.addEventListener('click', () => {
     if (!visibleModal) {
-        openModal(addHostModal, document.querySelector('#add-host-fname'));
+        openModal(addMonitorModal, document.querySelector('#add-monitor-fname'));
+
+        togglePortDataField();
     }
 });
 
-closeAddHost.addEventListener('click', () => {
+closeAddMonitor.addEventListener('click', () => {
     if (visibleModal) {
-        closeModal(addHostModal);
+        closeModal(addMonitorModal);
     }
 });
 
@@ -95,19 +111,25 @@ document.addEventListener('keydown', (e) => {
     if (e.key == 'Escape' && visibleModal && visibleModal.id != 'disconnected-modal') {
         closeModal(visibleModal);
     }
-})
+});
 
 document.addEventListener('click', (e) => {
     if (e.target==visibleModal && visibleModal.id != 'disconnected-modal') {
         closeModal(visibleModal);
     }
-})
+});
 
-addHostForm.addEventListener('submit', (e) => {
+ctype.addEventListener('change', () => {
+    togglePortDataField();
+});
+
+addMonitorForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const data = new FormData(addHostForm);
-    socket.emit('client:add-host', Object.fromEntries(data));
+    const data = new FormData(addMonitorForm);
+    data.append('ctype', ctype.value);
+    
+    socket.emit('client:add-monitor', Object.fromEntries(data));
 });
 
 /*
@@ -131,35 +153,34 @@ socket.on('disconnect', () => {
     openModal(disconnectedModal);
 });
 
-socket.on('server:send-hosts', (response) => {
+socket.on('server:send-monitors', (response) => {
     console.log(response);
     if (response.status == 'success') {
-        response.data.forEach(host => {
-            addHostBox(host);
+        response.data.forEach(monitor => {
+            addMonitorBox(monitor);
         });
     }
 });
 
-socket.on('server:add-host', (response) => {
+socket.on('server:add-monitor', (response) => {
     console.log(response);
     if (response.status == 'success') {
         closeModal(visibleModal);
-        addHostForm.reset();
+        addMonitorForm.reset();
     }
 });
 
-socket.on('server:new-host-added', (response) => {
+socket.on('server:new-monitor-added', (response) => {
     console.log(response)
     if (response.status == 'success') {
-       addHostBox(response.data);
+       addMonitorBox(response.data);
     }
 });
 
-socket.on('server:host-status-update', (response) => {
+socket.on('server:monitor-status-update', (response) => {
     console.log(response)
     if (response.status == 'success') {
         const box = document.getElementById(response.data.id);
-        const status = box.querySelector('.status');
         if (response.data.exit_code == '0') {
             box.classList.remove('down');
             box.classList.add('up');
@@ -170,13 +191,13 @@ socket.on('server:host-status-update', (response) => {
     }
 });
 
-socket.on('server:delete-host', (response) => {
+socket.on('server:delete-monitor', (response) => {
     console.log(response);
     if (response.status == 'success') {
         const box = document.getElementById(response.data.id);
         box.remove();
     }
-})
+});
 
 socket.on('server:send-events', (response) => {
     if (response.status == 'success') {
@@ -197,4 +218,4 @@ socket.on('server:send-events', (response) => {
             row.appendChild(status);
         });
     }
-})
+});

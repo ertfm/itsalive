@@ -1,45 +1,46 @@
-from app import socket
-from app.services import add_host, get_hosts, delete_host, get_events
+from app import socketio
+from app.services import add_monitor, get_monitors, delete_monitor, get_events
 from flask import request
 
-@socket.on('connect')
+@socketio.on('connect')
 def connection_handler():
     client_id = request.sid
     try:
-        hosts = [ host.to_json() for host in get_hosts() ]
-        if hosts:
-            socket.emit('server:send-hosts', { 'status':'success', 'data':hosts}, to=client_id)
+        monitors = [ monitor.to_json() for monitor in get_monitors() ]
+        if monitors:
+            socketio.emit('server:send-monitors', { 'status':'success', 'data':monitors}, to=client_id)
 
     except Exception as e:
-        socket.emit('server:send-hosts', { 'status':'error', 'data': 'here goes a descriptive error'})
+        socketio.emit('server:send-monitors', { 'status':'error', 'data': 'here goes a descriptive error'})
 
-@socket.on('client:add-host')
-def add_host_handler(new_host):
+@socketio.on('client:add-monitor')
+def add_monitor_handler(new_monitor):
     client_id = request.sid
     try:
-        host = add_host(new_host)
-        socket.emit('server:add-host', {'status': 'success','data': '' , 'message': 'Host added successfuly'}, to=client_id)
-        socket.emit('server:new-host-added', {'status': 'success','data': host.to_json() , 'message': 'New host added'})
+        monitor = add_monitor(new_monitor)
+        socketio.emit('server:add-monitor', {'status': 'success','data': '' , 'message': 'Monitor added successfuly'}, to=client_id)
+        socketio.emit('server:new-monitor-added', {'status': 'success','data': monitor.to_json() , 'message': 'New monitor added'})
 
     except Exception as e:
-        socket.emit('server:add-host',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'}, to=client_id)
+        print(e)
+        socketio.emit('server:add-monitor',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'}, to=client_id)
 
-@socket.on('client:delete-host')
-def delete_host_handler(host):
+@socketio.on('client:delete-monitor')
+def delete_monitor_handler(monitor):
     try:
-        host = delete_host(host)
-        socket.emit('server:delete-host', { 'status':'success','data': { 'id':host.id },'message':'Host delete successfuly' })
+        monitor = delete_monitor(monitor)
+        socketio.emit('server:delete-monitor', { 'status':'success','data': { 'id':monitor.id },'message':'Monitor delete successfuly' })
     
     except Exception as e:
         print(e)
-        socket.emit('server:delete-host',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})
+        socketio.emit('server:delete-monitor',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})
 
-@socket.on('client:send-events')
+@socketio.on('client:send-events')
 def send_events_handler():
     try:
         events = [ event.to_json() for event in get_events() ]
-        socket.emit('server:send-events', {'status':'success','data': events, 'message':'Events sent succeessfuly'})
+        socketio.emit('server:send-events', {'status':'success','data': events, 'message':'Events sent succeessfuly'})
     
     except Exception as e:
         print(e)
-        socket.emit('server:add-host',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})
+        socketio.emit('server:send-events',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})

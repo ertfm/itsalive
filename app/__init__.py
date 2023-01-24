@@ -11,22 +11,19 @@ db_path = Path(Path.cwd(),'data','database.db')
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + str(db_path)
 db = SQLAlchemy(app)
-socket = SocketIO(app)
+socketio = SocketIO(app)
 
 scheduler = BackgroundScheduler()
 
 scheduler.start()
 
-from app.models import Host
-from app.services import get_hosts, schedule_ping
+from app.models import Monitor
+from app.services import get_monitors, schedule_check
 
 with app.app_context():
     db.create_all()
-    hosts = get_hosts()
-    if hosts:
-        schedule_ping(hosts)
+    monitors = get_monitors()
+    if monitors:
+        schedule_check(monitors)
 
 from app import views, socket_handlers
-
-
-    

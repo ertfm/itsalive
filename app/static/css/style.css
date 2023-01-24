@@ -35,7 +35,7 @@
     box-shadow: 0 0 12px;
 }
 
-.del-host-btn {
+.del-monitor-btn {
     all: unset;
     background-image: var(--icon-close);
     background-position: center;
@@ -54,7 +54,7 @@
     right: -10px;
 }
 
-.box:hover > .del-host-btn {
+.box:hover > .del-monitor-btn {
     display: block;
 }
 
