@@ -1,14 +1,10 @@
-# It's alive!
+<img src="https://raw.githubusercontent.com/ertfm/itsalive/main/itsalive.png" />
 
-Simple self-hosted uptime monitoring tool. If you only want to display up/down hosts and don't need auth nor notifications, maybe this is for you. **It's still a work in progress so for now is not production ready**.
-
-## Screenshots
-
-<img src="https://github.com/ertfm/itsalive/blob/main/itsalive.png" />
+It's alive! is a simple self-hosted uptime monitoring tool. If you only want to display up/down hosts and don't need auth nor notifications, this is for you.
 
 ## Features
 
-* ping check
+* ping/tcp check
 * 30s interval
 
 ## How to install
@@ -33,5 +29,3 @@ Simple self-hosted uptime monitoring tool. If you only want to display up/down h
 ## Motivation
 
 Learn webdev.
-
-
