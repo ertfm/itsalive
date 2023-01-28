@@ -182,10 +182,16 @@ socket.on('server:monitor-status-update', (response) => {
     if (response.status == 'success') {
         const box = document.getElementById(response.data.id);
         if (response.data.exit_code == '0') {
-            box.classList.remove('down');
+            if (box.classList.contains('down')) {
+                box.classList.remove('down');
+                dashboard.append(box);
+            }
             box.classList.add('up');
         } else {
-            box.classList.remove('up');
+            if (box.classList.contains('up') || (!box.classList.contains('down') && (!box.classList.contains('up'))) ) {
+                box.classList.remove('up');
+                dashboard.prepend(box);
+            }
             box.classList.add('down');
         }
     }
