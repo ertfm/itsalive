@@ -37,7 +37,7 @@
                     <label for="fname">Friendly name:</label>
                     <input type="text" id="add-monitor-fname" name="fname" placeholder="Insert friendly name" required>
                     <label for="hostname">Hostname:</label>
-                    <input type="text" id="add-monitor-hostname" name="hostname" placeholder="Insert hostname" required>
+                    <input type="text" id="add-monitor-hostname" name="hostname" placeholder="Insert hostname" pattern="{{ hostname_re }}" required>
                     <label for="ctype">Type</label>
                     <select id="ctype" named="ctype" form="add-monitor-form" required>
                         <option value="ping">Ping</option>
@@ -45,7 +45,7 @@
                     </select>
                     <fieldset id="port-data-field">
                         <label for="port">Port</label>
-                        <input type="text" name="port" placeholder="Insert TCP port" id="port">
+                        <input type="number" name="port" placeholder="Insert TCP port" id="port" min="0" max="65535">
                     </fieldset>
                     <button type="submit">Add</button>
                 </form>

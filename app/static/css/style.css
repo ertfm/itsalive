@@ -6,6 +6,15 @@
     margin-top:20px;
 }
 
+#port::-webkit-outer-spin-button,
+#port::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+#port {
+    -moz-appearance: textfield;
+}
+
 .box {
     padding: 0.5em;
     width: 18em;
