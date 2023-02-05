@@ -12,9 +12,9 @@ const closeShowEvents = document.querySelector('#close-show-events');
 const addMonitorForm = document.querySelector('#add-monitor-form');
 const disconnectedModal = document.querySelector('#disconnected-modal');
 const events = showEventsModal.querySelector('table').querySelector('tbody');
-const ctype = addMonitorForm.querySelector('#ctype')
-const portDataField = addMonitorForm.querySelector('#port-data-field')
-const port = portDataField.querySelector('#port')
+const ctype = addMonitorForm.querySelector('#ctype');
+const portDataField = addMonitorForm.querySelector('#port-data-field');
+const port = portDataField.querySelector('#port');
 
 const socket = io();
 let visibleModal = null;
@@ -33,13 +33,21 @@ function addMonitorBox(monitor) {
 
     const hostname = document.createElement('p');
     hostname.textContent = monitor.hostname;
+
+    const ctype = document.createElement('p');
+    if (monitor.ctype == 'tcp') {
+        ctype.textContent = monitor.port + '/tcp';
+    } else {
+        ctype.textContent = 'ping';
+    }
     
     const del = document.createElement('button')
-    del.className = 'del-monitor-btn'
-    del.textContent = ''
+    del.className = 'del-monitor-btn';
+    del.textContent = '';
 
     box.appendChild(fname);
     box.appendChild(hostname);
+    box.appendChild(ctype);
     box.appendChild(del);
     dashboard.appendChild(box);
 
@@ -147,14 +155,12 @@ socket.on('connect', () => {
 socket.on('disconnect', () => {
     dashboard.innerHTML = '';
     if (visibleModal) {
-        console.log(visibleModal);
         closeModal(visibleModal);
     }
     openModal(disconnectedModal);
 });
 
 socket.on('server:send-monitors', (response) => {
-    console.log(response);
     if (response.status == 'success') {
         response.data.forEach(monitor => {
             addMonitorBox(monitor);
@@ -163,7 +169,6 @@ socket.on('server:send-monitors', (response) => {
 });
 
 socket.on('server:add-monitor', (response) => {
-    console.log(response);
     if (response.status == 'success') {
         closeModal(visibleModal);
         addMonitorForm.reset();
@@ -171,14 +176,12 @@ socket.on('server:add-monitor', (response) => {
 });
 
 socket.on('server:new-monitor-added', (response) => {
-    console.log(response)
     if (response.status == 'success') {
        addMonitorBox(response.data);
     }
 });
 
 socket.on('server:monitor-status-update', (response) => {
-    console.log(response)
     if (response.status == 'success') {
         const box = document.getElementById(response.data.id);
         if (response.data.exit_code == '0') {
@@ -198,7 +201,6 @@ socket.on('server:monitor-status-update', (response) => {
 });
 
 socket.on('server:delete-monitor', (response) => {
-    console.log(response);
     if (response.status == 'success') {
         const box = document.getElementById(response.data.id);
         box.remove();

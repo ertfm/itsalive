@@ -18,7 +18,7 @@
 .box {
     padding: 0.5em;
     width: 18em;
-    height: 4.5em;
+    height: 6em;
     margin: 0.5em;
     border-radius: 1em;
     position: relative;
@@ -44,11 +44,19 @@
     box-shadow: 0 0 12px;
 }
 
+.box:hover > .del-monitor-btn {
+    display: block;
+}
+
+.box:hover > p {
+    display: block;
+}
+
 .del-monitor-btn {
     all: unset;
     background-image: var(--icon-close);
     background-position: center;
-    background-size: auto 0.7rem;
+    background-size: auto 1rem;
     background-repeat: no-repeat;
     height: 1rem;
     width: 1rem;
@@ -61,14 +69,6 @@
     background-color: var(--card-background-color);
     top:-10px;
     right: -10px;
-}
-
-.box:hover > .del-monitor-btn {
-    display: block;
-}
-
-.box:hover > p {
-    display: block;
 }
 
 .up {
