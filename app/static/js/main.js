@@ -218,11 +218,19 @@ socket.on('server:send-events', (response) => {
             let fname = row.insertCell(1);
             fname.textContent = event.fname;
 
-            let status = row.insertCell(2);
+            let ctype = row.insertCell(2);
+            if (event.ctype == 'tcp') {
+                ctype.textContent = event.port + '/tcp';
+            } else {
+                ctype.textContent = event.ctype;
+            }
+
+            let status = row.insertCell(3);
             status.textContent = event.status;
 
             row.appendChild(datetime);
             row.appendChild(fname);
+            row.appendChild(ctype);
             row.appendChild(status);
         });
     }

@@ -35,10 +35,9 @@ def check_monitor(monitor):
         try:
             was_up = get_last_up_status(monitor)
             if (was_up == MonitorUpState.DOWN or was_up == MonitorUpState.UNKNOWN) and exit_code == 0:
-                db.session.add(Event(fname=monitor.fname,status='UP'))
+                db.session.add(Event(fname=monitor.fname, ctype=monitor.ctype,port=monitor.port, status='UP'))
             if (was_up == MonitorUpState.UP or was_up == MonitorUpState.UNKNOWN) and exit_code != 0:
-                db.session.add(Event(fname=monitor.fname,status='DOWN'))
-
+                db.session.add(Event(fname=monitor.fname, ctype=monitor.ctype, port=monitor.port, status='DOWN'))
 
             db.session.add(MonitorUpStatus(monitor_id=monitor.id,up=exit_code))
             db.session.commit()
@@ -72,11 +71,11 @@ def add_monitor(new_monitor):
     hostname = new_monitor['hostname']
     ctype = new_monitor['ctype']
     port = new_monitor['port']
-
     monitor = Monitor(fname=fname, hostname=hostname, ctype=ctype, port=port)
 
     db.session.add(monitor)
-    db.session.add(Event(fname=monitor.fname,status='ADD'))
+
+    db.session.add(Event(fname=monitor.fname,ctype=monitor.ctype, port=monitor.port, status='ADD'))
     db.session.commit()
     
     schedule_check([monitor])
@@ -86,7 +85,7 @@ def add_monitor(new_monitor):
 def delete_monitor(monitor):
     monitor = db.session.query(Monitor).filter_by(fname=monitor['fname']).first()
     db.session.delete(monitor)
-    db.session.add(Event(fname=monitor.fname,status='DELETE'))
+    db.session.add(Event(fname=monitor.fname, ctype=monitor.ctype, port=monitor.port, status='DELETE'))
     db.session.commit()
     scheduler.remove_job(str(monitor.id))
     
