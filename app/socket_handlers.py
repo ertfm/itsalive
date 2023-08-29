@@ -11,7 +11,8 @@ def connection_handler():
             socketio.emit('server:send-monitors', { 'status':'success', 'data':monitors}, to=client_id)
 
     except Exception as e:
-        socketio.emit('server:send-monitors', { 'status':'error', 'data': 'here goes a descriptive error'})
+        message = 'There was a problem getting the monitors. Refresh the page or contact your system administrator'
+        socketio.emit('server:send-monitors', { 'status':'error', 'data':'', 'message': message}, to=client_id)
 
 @socketio.on('client:add-monitor')
 def add_monitor_handler(new_monitor):
@@ -22,25 +23,27 @@ def add_monitor_handler(new_monitor):
         socketio.emit('server:new-monitor-added', {'status': 'success','data': monitor.to_json() , 'message': 'New monitor added'})
 
     except Exception as e:
-        print(e)
-        socketio.emit('server:add-monitor',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'}, to=client_id)
+        message = f'There was a problem adding {new_monitor["fname"]} monitor. Try again or contact your system administrator.'
+        socketio.emit('server:add-monitor',{ 'status': 'error', 'data': '', 'message': message}, to=client_id)
 
 @socketio.on('client:delete-monitor')
 def delete_monitor_handler(monitor):
+    client_id = request.sid
     try:
         monitor = delete_monitor(monitor)
         socketio.emit('server:delete-monitor', { 'status':'success','data': { 'id':monitor.id },'message':'Monitor delete successfuly' })
     
     except Exception as e:
-        print(e)
-        socketio.emit('server:delete-monitor',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})
+        message = f'There was a problem deleting {monitor["fname"]} monitor. Try again or contact your system administrator.'
+        socketio.emit('server:delete-monitor',{ 'status': 'error', 'data': '', 'message': message}, to=client_id)
 
 @socketio.on('client:send-events')
 def send_events_handler():
+    client_id = request.sid
     try:
         events = [ event.to_json() for event in get_events() ]
         socketio.emit('server:send-events', {'status':'success','data': events, 'message':'Events sent succeessfuly'})
     
     except Exception as e:
-        print(e)
-        socketio.emit('server:send-events',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})
+        message = 'There was a problem getting the events. Try again or contact your system administrator.'
+        socketio.emit('server:send-events',{ 'status': 'error', 'data': '', 'message': message}, to=client_id)

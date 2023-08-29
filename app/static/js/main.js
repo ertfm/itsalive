@@ -2,6 +2,7 @@
 Variables
 */
 
+const nav = document.querySelector('nav');
 const dashboard = document.querySelector('#dashboard');
 const showAddMonitor = document.querySelector('#show-add-monitor');
 const showEvents = document.querySelector('#show-events');
@@ -22,6 +23,29 @@ let visibleModal = null;
 /*
 Functions
 */
+
+function showError(message) {
+    const errorBox = document.createElement('div');
+    errorBox.className = "error-box";
+    
+    const errorText = document.createElement('p');
+    errorText.className = "error-text";
+    errorText.textContent = message;
+
+    const closeButton = document.createElement('button');
+    closeButton.className = 'error-close-button';
+    closeButton.textContent = 'x';
+
+    errorBox.appendChild(errorText);
+    errorBox.appendChild(closeButton);
+    const errorBoxExist = document.querySelector('.errorBox');
+
+    nav.before(errorBox);
+
+    closeButton.addEventListener('click', () => {
+        errorBox.remove()
+    })
+}
 
 function addMonitorBox(monitor) {
     const box = document.createElement('div');
@@ -165,6 +189,8 @@ socket.on('server:send-monitors', (response) => {
         response.data.forEach(monitor => {
             addMonitorBox(monitor);
         });
+    } else {
+        showError(response.message);
     }
 });
 
@@ -172,18 +198,24 @@ socket.on('server:add-monitor', (response) => {
     if (response.status == 'success') {
         closeModal(visibleModal);
         addMonitorForm.reset();
+    }  else {
+        closeModal(visibleModal);
+        showError(response.message);
     }
 });
 
 socket.on('server:new-monitor-added', (response) => {
     if (response.status == 'success') {
        addMonitorBox(response.data);
+    } else {
+        showError(response.message);
     }
 });
 
 socket.on('server:monitor-status-update', (response) => {
+    const box = document.getElementById(response.data.id);
     if (response.status == 'success') {
-        const box = document.getElementById(response.data.id);
+
         if (response.data.exit_code == '0') {
             if (box.classList.contains('down')) {
                 box.classList.remove('down');
@@ -197,6 +229,10 @@ socket.on('server:monitor-status-update', (response) => {
             }
             box.classList.add('down');
         }
+    } else {
+        showError(response.message);
+        box.classList.remove('up')
+        box.classList.remove('down')
     }
 });
 
@@ -204,6 +240,8 @@ socket.on('server:delete-monitor', (response) => {
     if (response.status == 'success') {
         const box = document.getElementById(response.data.id);
         box.remove();
+    } else {
+        showError(response.message);
     }
 });
 
@@ -233,5 +271,8 @@ socket.on('server:send-events', (response) => {
             row.appendChild(ctype);
             row.appendChild(status);
         });
+    } else {
+        closeModal(visibleModal);
+        showError(response.message);
     }
 });

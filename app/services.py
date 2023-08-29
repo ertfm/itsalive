@@ -26,13 +26,13 @@ def get_last_up_status(monitor):
     return MonitorUpState.UNKNOWN
 
 def check_monitor(monitor):
-    if monitor.ctype == 'ping':
-        exit_code = check_ping(monitor)
-    if monitor.ctype == 'tcp':
-        exit_code = check_tcp(monitor)
-    
     with app.app_context():
         try:
+            if monitor.ctype == 'ping':
+                exit_code = check_ping(monitor)
+            if monitor.ctype == 'tcp':
+                exit_code = check_tcp(monitor)
+
             was_up = get_last_up_status(monitor)
             if (was_up == MonitorUpState.DOWN or was_up == MonitorUpState.UNKNOWN) and exit_code == 0:
                 db.session.add(Event(fname=monitor.fname, ctype=monitor.ctype,port=monitor.port, status='UP'))
@@ -45,7 +45,8 @@ def check_monitor(monitor):
             socketio.emit('server:monitor-status-update', {'status':'success', 'data': { 'id':monitor.id, 'exit_code':exit_code}})
 
         except Exception as e:
-            socketio.emit('server:monitor-status-update',{ 'status': 'error', 'data': '', 'message': 'Here goes a descriptive error'})
+            message = f'There was a problem querying the status of {monitor.fname} monitor. Contact your system administrator.'
+            socketio.emit('server:monitor-status-update',{ 'status': 'error', 'data': {'id':monitor.id}, 'message': message})
     
 def check_tcp(monitor):
     sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -55,14 +56,10 @@ def check_tcp(monitor):
 
     sc.close()
 
-    print(f'{monitor.fname}:{monitor.port}-{exit_code}')
     return exit_code
 
 def check_ping(monitor):
     exit_code = call(['ping','-c','1',monitor.hostname], stdout=DEVNULL, stderr=DEVNULL)
-    
-    print(f'{monitor.fname}:{exit_code}')
-
     return exit_code
         
 
