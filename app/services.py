@@ -10,7 +10,7 @@ class MonitorUpState(Enum):
     UNKNOWN = 2
 
 def get_monitors():
-    monitors = [ monitor for monitor in db.session.execute(db.select(Monitor)).scalars()]
+    monitors = [ monitor for monitor in db.session.scalars(db.select(Monitor)) ]
     return monitors
 
 def schedule_check(monitors):
@@ -80,7 +80,7 @@ def add_monitor(new_monitor):
     return monitor
 
 def delete_monitor(monitor):
-    monitor = db.session.query(Monitor).filter_by(fname=monitor['fname']).first()
+    monitor = db.session.scalars(db.select(Monitor).filter_by(fname=monitor['fname'])).first()
     db.session.delete(monitor)
     db.session.add(Event(fname=monitor.fname, ctype=monitor.ctype, port=monitor.port, status='DELETE'))
     db.session.commit()

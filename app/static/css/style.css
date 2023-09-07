@@ -65,7 +65,7 @@
     float: right;
     position: absolute;
     border-radius: 50%;
-    border: 2px solid var(--primary);
+    border: 3px solid var(--primary);
     background-color: var(--card-background-color);
     top:-10px;
     right: -10px;
@@ -89,15 +89,17 @@
     background-color: var(--del-color);
     padding: 3px;
     border: 1px solid var(--card-background-color);
+    position: absolute;
+    z-index: 1000;
 }
 
-.error-text {
+.error-txt {
     color: white;
     margin-bottom: 0;
     margin-right: 1rem;
 }
 
-.error-close-button {
+.error-close-btn {
     all: unset;
     color: white;
     margin-right: 0.5rem;

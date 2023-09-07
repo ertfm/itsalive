@@ -29,16 +29,15 @@ function showError(message) {
     errorBox.className = "error-box";
     
     const errorText = document.createElement('p');
-    errorText.className = "error-text";
+    errorText.className = "error-txt";
     errorText.textContent = message;
 
     const closeButton = document.createElement('button');
-    closeButton.className = 'error-close-button';
+    closeButton.className = 'error-close-btn';
     closeButton.textContent = 'x';
 
     errorBox.appendChild(errorText);
     errorBox.appendChild(closeButton);
-    const errorBoxExist = document.querySelector('.errorBox');
 
     nav.before(errorBox);
 
@@ -248,22 +247,22 @@ socket.on('server:delete-monitor', (response) => {
 socket.on('server:send-events', (response) => {
     if (response.status == 'success') {
         response.data.forEach(event => {
-            let row = events.insertRow();
+            const row = events.insertRow();
 
-            let datetime = row.insertCell(0);
+            const datetime = row.insertCell(0);
             datetime.textContent = event.created;
 
-            let fname = row.insertCell(1);
+            const fname = row.insertCell(1);
             fname.textContent = event.fname;
 
-            let ctype = row.insertCell(2);
+            const ctype = row.insertCell(2);
             if (event.ctype == 'tcp') {
                 ctype.textContent = event.port + '/tcp';
             } else {
                 ctype.textContent = event.ctype;
             }
 
-            let status = row.insertCell(3);
+            const status = row.insertCell(3);
             status.textContent = event.status;
 
             row.appendChild(datetime);
