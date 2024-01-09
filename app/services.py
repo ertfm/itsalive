@@ -2,6 +2,7 @@ from app import app, db, scheduler, socketio
 from app.models import Monitor, MonitorUpStatus, Event
 from subprocess import call, DEVNULL
 from enum import Enum
+from sqlalchemy import func
 import socket
 
 class MonitorUpState(Enum):
@@ -88,6 +89,13 @@ def delete_monitor(monitor):
     
     return monitor
 
-def get_events():
-    events = [ event for event in db.session.scalars(db.select(Event).order_by(Event.created.desc()).limit(100)) ]
+def get_events(limit,last_seen_id):
+    if not last_seen_id:
+        events = [ event for event in db.session.scalars(db.select(Event).order_by(Event.id.desc()).limit(limit)) ]
+    else:
+        events = [ event for event in db.session.scalars(db.select(Event).where(Event.id<last_seen_id).order_by(Event.id.desc()).limit(limit)) ]
     return events
+
+def get_total_events():
+    total = db.session.query(func.count(Event.id)).scalar()
+    return total

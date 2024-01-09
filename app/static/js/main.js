@@ -5,20 +5,26 @@ Variables
 const nav = document.querySelector('nav');
 const dashboard = document.querySelector('#dashboard');
 const showAddMonitor = document.querySelector('#show-add-monitor');
-const showEvents = document.querySelector('#show-events');
+const showEventsBtn = document.querySelector('#show-events-btn');
 const addMonitorModal = document.querySelector('#add-monitor-modal');
 const showEventsModal = document.querySelector('#show-events-modal');
 const closeAddMonitor = document.querySelector('#close-add-monitor');
 const closeShowEvents = document.querySelector('#close-show-events');
 const addMonitorForm = document.querySelector('#add-monitor-form');
 const disconnectedModal = document.querySelector('#disconnected-modal');
-const events = showEventsModal.querySelector('table').querySelector('tbody');
+const eventsTable = showEventsModal.querySelector('table').querySelector('tbody');
+const eventsContainer = showEventsModal.querySelector('article');
 const ctype = addMonitorForm.querySelector('#ctype');
 const portDataField = addMonitorForm.querySelector('#port-data-field');
 const port = portDataField.querySelector('#port');
 
 const socket = io();
 let visibleModal = null;
+
+//scroll vars
+let last_seen_id = null;
+let limit = 30;
+let canScroll = false;
 
 /*
 Functions
@@ -105,6 +111,36 @@ function togglePortDataField() {
     }
 }
 
+function getEvents() {
+    socket.emit('client:send-events',limit,last_seen_id);
+}
+
+function showEvents(events) {
+    events.forEach(event => {
+        const row = eventsTable.insertRow();
+
+        const datetime = row.insertCell(0);
+        datetime.textContent = event.created;
+
+        const fname = row.insertCell(1);
+        fname.textContent = event.fname;
+
+        const ctype = row.insertCell(2);
+        if (event.ctype == 'tcp') {
+            ctype.textContent = event.port + '/tcp';
+        } else {
+            ctype.textContent = event.ctype;
+        }
+
+        const status = row.insertCell(3);
+        status.textContent = event.status;
+
+        row.appendChild(datetime);
+        row.appendChild(fname);
+        row.appendChild(ctype);
+        row.appendChild(status);
+    });
+}
 /*
 Events Listeners
 */
@@ -123,10 +159,10 @@ closeAddMonitor.addEventListener('click', () => {
     }
 });
 
-showEvents.addEventListener('click', () => {
-    events.innerHTML = '';
-
-    socket.emit('client:send-events');
+showEventsBtn.addEventListener('click', () => {
+    eventsTable.innerHTML = '';
+    last_seen_id = null;
+    getEvents()
     if (!visibleModal) {
         openModal(showEventsModal);
     }
@@ -135,6 +171,19 @@ showEvents.addEventListener('click', () => {
 closeShowEvents.addEventListener('click', () => {
     if (visibleModal) {
         closeModal(showEventsModal);
+    }
+});
+
+eventsContainer.addEventListener('scroll', () => {
+    const {
+        scrollTop,
+        scrollHeight,
+        clientHeight
+    } = eventsContainer;
+
+    if (scrollTop + clientHeight >= scrollHeight - 5 && canScroll) {
+        canScroll=false;
+        getEvents()
     }
 });
 
@@ -246,30 +295,11 @@ socket.on('server:delete-monitor', (response) => {
 
 socket.on('server:send-events', (response) => {
     if (response.status == 'success') {
-        response.data.forEach(event => {
-            const row = events.insertRow();
-
-            const datetime = row.insertCell(0);
-            datetime.textContent = event.created;
-
-            const fname = row.insertCell(1);
-            fname.textContent = event.fname;
-
-            const ctype = row.insertCell(2);
-            if (event.ctype == 'tcp') {
-                ctype.textContent = event.port + '/tcp';
-            } else {
-                ctype.textContent = event.ctype;
-            }
-
-            const status = row.insertCell(3);
-            status.textContent = event.status;
-
-            row.appendChild(datetime);
-            row.appendChild(fname);
-            row.appendChild(ctype);
-            row.appendChild(status);
-        });
+        if (response.data.length>0) {
+            last_seen_id = response.data.at(-1).id
+            showEvents(response.data)
+        }
+        canScroll=true;
     } else {
         closeModal(visibleModal);
         showError(response.message);

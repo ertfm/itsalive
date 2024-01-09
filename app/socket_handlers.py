@@ -1,5 +1,5 @@
 from app import socketio
-from app.services import add_monitor, get_monitors, delete_monitor, get_events
+from app.services import add_monitor, get_monitors, delete_monitor, get_events, get_total_events
 from flask import request
 
 @socketio.on('connect')
@@ -38,11 +38,11 @@ def delete_monitor_handler(monitor):
         socketio.emit('server:delete-monitor',{ 'status': 'error', 'data': '', 'message': message}, to=client_id)
 
 @socketio.on('client:send-events')
-def send_events_handler():
+def send_events_handler(limit,last_seen_id=None):
     client_id = request.sid
     try:
-        events = [ event.to_json() for event in get_events() ]
-        socketio.emit('server:send-events', {'status':'success','data': events, 'message':'Events sent succeessfuly'})
+        events = [ event.to_json() for event in get_events(limit,last_seen_id) ]
+        socketio.emit('server:send-events', {'status':'success', 'data': events, 'message':'Events sent succeessfuly'}, to=client_id)
     
     except Exception as e:
         message = 'There was a problem getting the events. Try again or contact your system administrator.'
